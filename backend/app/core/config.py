@@ -11,6 +11,8 @@ class Settings:
     app_name: str = os.getenv("APP_NAME", "BitPath API")
     app_env: str = os.getenv("APP_ENV", "development")
     frontend_url: str = os.getenv("FRONTEND_URL", "http://localhost:3000")
+    supabase_url: str = os.getenv("SUPABASE_URL", "")
+    supabase_jwt_audience: str = os.getenv("SUPABASE_JWT_AUDIENCE", "authenticated")
 
     @property
     def cors_origins(self) -> List[str]:
@@ -23,6 +25,14 @@ class Settings:
             self.frontend_url,
             "http://127.0.0.1:3000",
         ]
+
+    @property
+    def supabase_jwks_url(self) -> str:
+        return f"{self.supabase_url.rstrip('/')}/auth/v1/.well-known/jwks.json"
+
+    @property
+    def supabase_issuer(self) -> str:
+        return f"{self.supabase_url.rstrip('/')}/auth/v1"
 
 
 @lru_cache
