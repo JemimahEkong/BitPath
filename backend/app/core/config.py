@@ -1,0 +1,30 @@
+import os
+from functools import lru_cache
+from typing import List
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
+class Settings:
+    app_name: str = os.getenv("APP_NAME", "BitPath API")
+    app_env: str = os.getenv("APP_ENV", "development")
+    frontend_url: str = os.getenv("FRONTEND_URL", "http://localhost:3000")
+
+    @property
+    def cors_origins(self) -> List[str]:
+        origins = os.getenv("CORS_ORIGINS")
+
+        if origins:
+            return [origin.strip() for origin in origins.split(",") if origin.strip()]
+
+        return [
+            self.frontend_url,
+            "http://127.0.0.1:3000",
+        ]
+
+
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()
