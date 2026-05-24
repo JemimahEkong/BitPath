@@ -12,7 +12,11 @@ class Settings:
     app_env: str = os.getenv("APP_ENV", "development")
     frontend_url: str = os.getenv("FRONTEND_URL", "http://localhost:3000")
     supabase_url: str = os.getenv("SUPABASE_URL", "")
+    supabase_service_role_key: str = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
     supabase_jwt_audience: str = os.getenv("SUPABASE_JWT_AUDIENCE", "authenticated")
+    ai_stage_one_limit: int = int(os.getenv("AI_STAGE_ONE_LIMIT", "10"))
+    ai_stage_increment: int = int(os.getenv("AI_STAGE_INCREMENT", "5"))
+    ai_warning_threshold: int = int(os.getenv("AI_WARNING_THRESHOLD", "3"))
 
     @property
     def cors_origins(self) -> List[str]:
