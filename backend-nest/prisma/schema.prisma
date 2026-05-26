@@ -1,0 +1,262 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+//////////////////////
+// VERSION 1: SIMPLE ENUMS
+//////////////////////
+
+enum Role {
+  MEMBER
+}
+
+enum AuthProvider {
+  EMAIL
+  GOOGLE
+  TWITTER
+}
+
+enum SessionStatus {
+  ACTIVE
+  EXPIRED
+  TERMINATED
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+enum MessageType {
+  TEXT
+  QUIZ
+  QUIZ_RESULT
+  REWARD
+  SUGGESTION
+  LESSON
+}
+
+
+
+//////////////////////
+// CORE MODELS FOR VERSION 1
+//////////////////////
+
+// User - Simplified for V1
+model User {
+  id                    String        @id @default(cuid())
+  email                 String        @unique
+  isEmailVerified       Boolean       @default(true)
+  passwordHash          String?
+  lastLoginAt           DateTime?
+  isActive              Boolean       @default(true)
+  totalXp               Int           @default(0) // New: Total experience points
+  
+  // OAuth fields
+  googleId              String?       @unique
+  twitterId            String?       @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  oauthAccounts           OAuthAccount[]
+  sessions              Session[]
+   conversations Conversation[]
+   lessonProgress  LessonProgress[]
+   rewards               Reward[] // New: User can have multiple rewards
+  
+  @@map("users")
+}
+
+
+
+//////////////////////
+// OAUTH (Essential for existing system)
+//////////////////////
+
+model OAuthAccount {
+  id           String       @id @default(uuid())
+  userId       String
+  provider     AuthProvider
+  providerId   String
+  accessToken  String?
+  refreshToken String?
+  scope        String? // OAuth permissions
+  expiresAt    DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerId])
+  @@map("oauth_accounts")
+}
+
+
+//////////////////////
+// SESSIONS (Enhanced for existing system)
+//////////////////////
+
+model Session {
+  id           String        @id @default(uuid())
+  userId       String
+  token        String        @unique @db.Text
+  refreshToken String?       @unique @db.Text
+  status       SessionStatus @default(ACTIVE)
+  expiresAt    DateTime
+  lastActiveAt DateTime      @default(now())
+  createdAt    DateTime      @default(now())
+  terminatedAt DateTime?
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+
+enum ConversationMode {
+  GENERAL
+  QUIZ
+  LESSON
+  TUTORIAL
+}
+
+model Conversation {
+  id               String           @id @default(uuid())
+  userId           String
+
+  title            String?
+  topic            String?
+  summary          String?          @db.Text
+  contextSummary   String?          @db.Text // New: for AI memory/context
+  currentLessonId  String?          // New: Link to active lesson
+  conversationMode ConversationMode @default(GENERAL) // New: Current mode of conversation
+
+  // UI State
+  isPinned         Boolean          @default(false)
+  isArchived       Boolean          @default(false)
+
+  // AI Context
+  lastMessageAt    DateTime?
+  totalMessages    Int              @default(0)
+
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  currentLesson    Lesson?          @relation(fields: [currentLessonId], references: [id]) // New relation
+
+  messages         Message[]
+  quizzes          QuizAttempt[]
+  rewards          Reward[]
+
+  @@index([userId])
+  @@map("conversations")
+}
+
+// New Lesson Model
+model Lesson {
+  id          String         @id @default(uuid())
+  title       String
+  description String?        @db.Text
+  content     String         @db.Text // Markdown or structured content
+  topic       String
+  difficulty  String
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  progresses  LessonProgress[]
+  conversations Conversation[]
+
+  @@map("lessons")
+}
+
+model LessonProgress {
+  id               String @id @default(uuid())
+  userId           String
+  lessonId         String // Changed: Link to Lesson model
+  progress         Float  @default(0)
+  completed        Boolean @default(false)
+  lastActivityAt   DateTime?
+  createdAt        DateTime @default(now())
+
+  user             User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson           Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade) // New relation
+
+  @@unique([userId, lessonId]) // Ensure one progress entry per user per lesson
+  @@map("lesson_progress")
+}
+
+model QuizAttempt {
+  id               String @id @default(uuid())
+  conversationId   String
+  quizQuestionId   String? // New: Link to a potential QuizQuestion model later
+
+  question         String @db.Text
+  answer           String @db.Text
+  correctAnswer    String? @db.Text
+
+  isCorrect        Boolean?
+  xpEarned         Int @default(0)
+
+  createdAt        DateTime @default(now())
+
+  conversation     Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@map("quiz_attempts")
+}
+
+model Message {
+  id                String @id @default(uuid())
+
+  conversationId    String
+
+  role              MessageRole
+  type              MessageType @default(TEXT)
+
+  content           String @db.Text
+
+  // Streaming
+  isStreaming       Boolean @default(false)
+  isComplete        Boolean @default(true)
+
+  // AI Metadata
+  tokensUsed        Int?
+  modelUsed         String?
+
+  // Quiz/Interaction State
+  metadata          Json?
+
+  createdAt         DateTime @default(now())
+
+  conversation      Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@map("messages")
+}
+
+
+model Reward {
+  id               String @id @default(uuid())
+
+  conversationId   String
+  userId           String // <--- Add this field
+  
+  xp               Int @default(0)
+
+  btcReward        Float @default(0)
+
+  reason           String?
+
+  createdAt        DateTime @default(now())
+
+  conversation     Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade) // <--- Add this relation
+
+  @@map("rewards")
+}
+
