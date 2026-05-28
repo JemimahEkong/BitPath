@@ -1,3 +1,34 @@
+## Lightning / Breez Spark
+
+The rewards module includes a real Breez SDK Spark integration for Lightning invoices and outgoing Lightning payments.
+
+Required environment:
+
+```bash
+BREEZ_NETWORK=regtest
+BREEZ_MNEMONIC="twelve or twenty four word wallet seed"
+BREEZ_API_KEY="required for mainnet/testnet/signet"
+BREEZ_STORAGE_DIR="./.breez-spark/regtest"
+BREEZ_SERVER_MODE=false
+BREEZ_PREFER_SPARK_OVER_LIGHTNING=false
+REWARD_SATS_PER_XP=1
+```
+
+Regtest does not require a Breez API key and is the safest development default. Lightning-specific testing should use mainnet with very small amounts because Breez's Spark regtest is intended for Spark/on-chain development rather than the public Lightning Network.
+
+Useful endpoints:
+
+```http
+GET  /rewards/lightning/status
+POST /rewards/lightning/invoices
+POST /rewards/lightning/send
+POST /rewards/lightning/sync
+GET  /rewards/lightning/payments?userId=...
+GET  /rewards/lightning/sdk-payments/:paymentId
+```
+
+Generated invoices and outgoing sends are stored in `lightning_payments`, with SDK payment snapshots and status updates from `syncWallet`, `listPayments`, and live Breez SDK payment events.
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>

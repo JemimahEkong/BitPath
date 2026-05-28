@@ -42,7 +42,17 @@ enum MessageType {
   LESSON
 }
 
+enum LightningPaymentDirection {
+  INCOMING
+  OUTGOING
+}
 
+enum LightningPaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  UNKNOWN
+}
 
 //////////////////////
 // CORE MODELS FOR VERSION 1
@@ -50,29 +60,33 @@ enum MessageType {
 
 // User - Simplified for V1
 model User {
-  id                    String        @id @default(cuid())
-  email                 String        @unique
-  isEmailVerified       Boolean       @default(true)
-  passwordHash          String?
-  lastLoginAt           DateTime?
-  isActive              Boolean       @default(true)
-  totalXp               Int           @default(0) // New: Total experience points
-  
+  id              String    @id @default(cuid())
+  email           String    @unique
+  isEmailVerified Boolean   @default(true)
+  passwordHash    String?
+  lastLoginAt     DateTime?
+  isActive        Boolean   @default(true)
+  totalXp         Int       @default(0) // New: Total experience points
+
   // OAuth fields
-  googleId              String?       @unique
-  twitterId            String?       @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  oauthAccounts           OAuthAccount[]
-  sessions              Session[]
-   conversations Conversation[]
-   lessonProgress  LessonProgress[]
-   rewards               Reward[] // New: User can have multiple rewards
-  
+  googleId          String?            @unique
+  twitterId         String?            @unique
+  // Lightning/Wallet fields
+  lightningAddress  String?            @unique // LUD-16 address (e.g., user@bitpath.example)
+  walletPublicKey   String?            // Breez SDK wallet public key
+  walletMnemonic    String?            @db.Text // Encrypted mnemonic (optional backup)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  oauthAccounts     OAuthAccount[]
+  sessions          Session[]
+  conversations     Conversation[]
+  lessonProgress    LessonProgress[]
+  rewards           Reward[] // New: User can have multiple rewards
+  lightningPayments LightningPayment[]
+  lightningAnalytics LightningAnalytics[]
+
   @@map("users")
 }
-
-
 
 //////////////////////
 // OAUTH (Essential for existing system)
@@ -90,12 +104,11 @@ model OAuthAccount {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
-  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerId])
   @@map("oauth_accounts")
 }
-
 
 //////////////////////
 // SESSIONS (Enhanced for existing system)
@@ -112,11 +125,10 @@ model Session {
   createdAt    DateTime      @default(now())
   terminatedAt DateTime?
 
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
 }
-
 
 enum ConversationMode {
   GENERAL
@@ -126,33 +138,34 @@ enum ConversationMode {
 }
 
 model Conversation {
-  id               String           @id @default(uuid())
-  userId           String
+  id     String @id @default(uuid())
+  userId String
 
   title            String?
   topic            String?
   summary          String?          @db.Text
   contextSummary   String?          @db.Text // New: for AI memory/context
-  currentLessonId  String?          // New: Link to active lesson
+  currentLessonId  String? // New: Link to active lesson
   conversationMode ConversationMode @default(GENERAL) // New: Current mode of conversation
 
   // UI State
-  isPinned         Boolean          @default(false)
-  isArchived       Boolean          @default(false)
+  isPinned   Boolean @default(false)
+  isArchived Boolean @default(false)
 
   // AI Context
-  lastMessageAt    DateTime?
-  totalMessages    Int              @default(0)
+  lastMessageAt DateTime?
+  totalMessages Int       @default(0)
 
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  currentLesson    Lesson?          @relation(fields: [currentLessonId], references: [id]) // New relation
+  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  currentLesson Lesson? @relation(fields: [currentLessonId], references: [id]) // New relation
 
-  messages         Message[]
-  quizzes          QuizAttempt[]
-  rewards          Reward[]
+  messages          Message[]
+  quizzes           QuizAttempt[]
+  rewards           Reward[]
+  lightningPayments LightningPayment[]
 
   @@index([userId])
   @@map("conversations")
@@ -160,103 +173,169 @@ model Conversation {
 
 // New Lesson Model
 model Lesson {
-  id          String         @id @default(uuid())
+  id          String   @id @default(uuid())
   title       String
-  description String?        @db.Text
-  content     String         @db.Text // Markdown or structured content
+  description String?  @db.Text
+  content     String   @db.Text // Markdown or structured content
   topic       String
   difficulty  String
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  progresses  LessonProgress[]
+  progresses    LessonProgress[]
   conversations Conversation[]
 
   @@map("lessons")
 }
 
 model LessonProgress {
-  id               String @id @default(uuid())
-  userId           String
-  lessonId         String // Changed: Link to Lesson model
-  progress         Float  @default(0)
-  completed        Boolean @default(false)
-  lastActivityAt   DateTime?
-  createdAt        DateTime @default(now())
+  id             String    @id @default(uuid())
+  userId         String
+  lessonId       String // Changed: Link to Lesson model
+  progress       Float     @default(0)
+  completed      Boolean   @default(false)
+  lastActivityAt DateTime?
+  createdAt      DateTime  @default(now())
 
-  user             User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lesson           Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade) // New relation
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade) // New relation
 
   @@unique([userId, lessonId]) // Ensure one progress entry per user per lesson
   @@map("lesson_progress")
 }
 
 model QuizAttempt {
-  id               String @id @default(uuid())
-  conversationId   String
-  quizQuestionId   String? // New: Link to a potential QuizQuestion model later
+  id             String  @id @default(uuid())
+  conversationId String
+  quizQuestionId String? // New: Link to a potential QuizQuestion model later
 
-  question         String @db.Text
-  answer           String @db.Text
-  correctAnswer    String? @db.Text
+  question      String  @db.Text
+  answer        String  @db.Text
+  correctAnswer String? @db.Text
 
-  isCorrect        Boolean?
-  xpEarned         Int @default(0)
+  isCorrect Boolean?
+  xpEarned  Int      @default(0)
 
-  createdAt        DateTime @default(now())
+  createdAt DateTime @default(now())
 
-  conversation     Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
   @@map("quiz_attempts")
 }
 
 model Message {
-  id                String @id @default(uuid())
+  id String @id @default(uuid())
 
-  conversationId    String
+  conversationId String
 
-  role              MessageRole
-  type              MessageType @default(TEXT)
+  role MessageRole
+  type MessageType @default(TEXT)
 
-  content           String @db.Text
+  content String @db.Text
 
   // Streaming
-  isStreaming       Boolean @default(false)
-  isComplete        Boolean @default(true)
+  isStreaming Boolean @default(false)
+  isComplete  Boolean @default(true)
 
   // AI Metadata
-  tokensUsed        Int?
-  modelUsed         String?
+  tokensUsed Int?
+  modelUsed  String?
 
   // Quiz/Interaction State
-  metadata          Json?
+  metadata Json?
 
-  createdAt         DateTime @default(now())
+  createdAt DateTime @default(now())
 
-  conversation      Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
   @@index([conversationId])
   @@map("messages")
 }
 
-
 model Reward {
-  id               String @id @default(uuid())
+  id String @id @default(uuid())
 
-  conversationId   String
-  userId           String // <--- Add this field
-  
-  xp               Int @default(0)
+  conversationId String
+  userId         String // <--- Add this field
 
-  btcReward        Float @default(0)
+  xp Int @default(0)
 
-  reason           String?
+  btcReward Float @default(0)
 
-  createdAt        DateTime @default(now())
+  reason String?
 
-  conversation     Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade) // <--- Add this relation
+  createdAt DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade) // <--- Add this relation
 
   @@map("rewards")
 }
 
+model LightningPayment {
+  id             String  @id @default(uuid())
+  userId         String
+  conversationId String?
+
+  externalPaymentId String? @unique
+  paymentRequest    String? @db.Text
+  paymentHash       String? @unique
+  idempotencyKey    String? @unique
+
+  direction  LightningPaymentDirection
+  status     LightningPaymentStatus    @default(PENDING)
+  amountSats BigInt?
+  feeSats    BigInt                    @default(0)
+
+  description String? @db.Text
+  reason      String?
+  sdkPayment  Json?
+
+  expiresAt DateTime?
+  settledAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversation Conversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([conversationId])
+  @@index([status])
+  @@index([direction])
+  @@map("lightning_payments")
+}
+
+//////////////////////
+// ANALYTICS & REPORTING
+//////////////////////
+
+model LightningAnalytics {
+  id        String   @id @default(uuid())
+  userId    String
+  date      DateTime @db.Date // Daily aggregation
+  
+  // Incoming payments
+  incomingCount    Int    @default(0)
+  incomingVolumeSats BigInt @default(0)
+  incomingFeeSats  BigInt @default(0)
+  
+  // Outgoing payments
+  outgoingCount    Int    @default(0)
+  outgoingVolumeSats BigInt @default(0)
+  outgoingFeeSats  BigInt @default(0)
+  
+  // Stats
+  successRate      Float  @default(0) // 0-100
+  failedCount      Int    @default(0)
+  averageFeeSats   BigInt @default(0)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, date])
+  @@index([userId])
+  @@map("lightning_analytics")
+}
