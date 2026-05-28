@@ -405,4 +405,4 @@ Frontend Zustand stores interact with backend endpoints for:
 
 # License
 
-This project is currently private/internal.
+MIT Licensed
