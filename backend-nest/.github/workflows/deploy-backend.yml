@@ -3,7 +3,7 @@ name: Deploy Backend (Docker Hub)
 on:
   push:
     branches:
-      - feature/backend
+      - 'feature/backend'
 
 env:
   IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/bitpath-backend
