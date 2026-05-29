@@ -1,8 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Sparkles, Zap, Target, BookOpen, Bitcoin, TrendingUp, ArrowRight, Check, ChevronRight } from 'lucide-react';
+import { Sparkles, Zap, Target, BookOpen, Bitcoin, TrendingUp, Check, MessageCircle, HelpCircle, Rocket, Shield, Wallet, Monitor, Clock } from 'lucide-react';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -12,18 +13,51 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-};
-
 const fadeIn = {
   hidden: { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
 };
 
+const SunIcon = ({ size }: { size: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="12" cy="12" r="5" />
+    <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+  </svg>
+);
+
+const MoonIcon = ({ size }: { size: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+  </svg>
+);
+
 export default function Home() {
   const router = useRouter();
+  const [isDark, setIsDark] = useState(false);
+
+  const t = {
+    bg: isDark ? '#0a0a0b' : '#f8f8fa',
+    cardBg: isDark ? 'rgba(22,22,24,0.7)' : 'rgba(255,255,255,0.8)',
+    text: isDark ? '#ffffff' : '#1a1a2e',
+    textSecondary: isDark ? '#e5e2e3' : '#3a3a4e',
+    muted: isDark ? '#a1a1aa' : '#6b7280',
+    border: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+    sectionBg: isDark ? '#1c1b1c' : '#f0f0f2',
+    footerBg: isDark ? '#0a0a0b' : '#e8e8ea',
+    headerBg: isDark ? 'rgba(22,22,24,0.7)' : 'rgba(248,248,250,0.7)',
+    shadow: isDark ? 'inset 0px 1px 1px 0px rgba(255,255,255,0.05)' : 'inset 0px 1px 1px 0px rgba(0,0,0,0.02)',
+    accent: '#ffb874',
+    accentDark: '#f7931a',
+    accentMuted: isDark ? '#8c4f00' : '#d48a2a',
+    navActiveBg: isDark ? 'rgba(28,27,28,0.5)' : 'rgba(240,240,242,0.5)',
+    chatBg: isDark ? '#201f20' : '#f0f0f2',
+    chatBorder: isDark ? '#2a2a2b' : '#e4e4e7',
+    aiMessageBg: isDark ? '#2a2a2b' : '#e8e8ea',
+    quizOptionBg: isDark ? 'rgba(10,10,11,0.5)' : 'rgba(248,248,250,0.5)',
+    bitcoinBg: isDark ? 'rgba(255,184,105,0.2)' : 'rgba(255,184,105,0.15)',
+    glowBg: isDark ? 'rgba(255,184,116,0.05)' : 'rgba(255,184,116,0.03)',
+    streakBg: isDark ? 'rgba(22,22,24,0.7)' : 'rgba(255,255,255,0.65)',
+  };
 
   const features = [
     {
@@ -35,7 +69,7 @@ export default function Home() {
       graphic: true,
     },
     {
-      icon: Zap,
+      icon: BookOpen,
       title: 'Gamified XP & Rewards',
       description: 'Earn Sats (fractions of Bitcoin) and XP badges as you level up. Turn your knowledge into tangible digital assets.',
       accent: '#ffb874',
@@ -78,25 +112,30 @@ export default function Home() {
   ];
 
   const steps = [
-    { icon: '💬', title: 'Ask', desc: 'Start a conversation' },
-    { icon: '📖', title: 'Learn', desc: 'Grasp new concepts' },
-    { icon: '✍️', title: 'Quiz', desc: 'Test your skill' },
-    { icon: '⚡', title: 'Earn', desc: 'Get real Bitcoin' },
-    { icon: '🚀', title: 'Progress', desc: 'Unlock next level' },
+    { icon: MessageCircle, title: 'Ask', desc: 'Start a conversation' },
+    { icon: BookOpen, title: 'Learn', desc: 'Grasp new concepts' },
+    { icon: HelpCircle, title: 'Quiz', desc: 'Test your skill' },
+    { icon: Zap, title: 'Earn', desc: 'Get real Bitcoin' },
+    { icon: Rocket, title: 'Progress', desc: 'Unlock next level' },
   ];
 
   const topics = [
-    { icon: '₿', name: 'Bitcoin Basics' },
-    { icon: '🛡️', name: 'Wallet Safety' },
-    { icon: '⚡', name: 'Lightning Payments' },
-    { icon: '💰', name: 'Personal Finance' },
-    { icon: '💻', name: 'Digital Skills' },
-    { icon: '🔮', name: 'Coming Soon', dashed: true },
+    { icon: () => <span style={{ fontFamily: 'var(--font-inter)', fontWeight: 700, fontSize: 18, color: t.accent }}>B</span>, name: 'Bitcoin Basics' },
+    { icon: Shield, name: 'Wallet Safety' },
+    { icon: Zap, name: 'Lightning Payments' },
+    { icon: Wallet, name: 'Personal Finance' },
+    { icon: Monitor, name: 'Digital Skills' },
+    { icon: Clock, name: 'Coming Soon', dashed: true },
   ];
 
+  const TopicIconComponent = ({ icon: Icon, dashed }: { icon: any; dashed?: boolean }) => {
+    if (typeof Icon === 'function' && Icon.length === 0) return <Icon />;
+    return <Icon size={18} color={dashed ? t.muted : t.accent} />;
+  };
+
   return (
-    <div style={{ backgroundColor: '#0a0a0b', minHeight: '100vh', overflow: 'hidden' }}>
-      {/* Header - TopNavBar */}
+    <div style={{ backgroundColor: t.bg, minHeight: '100vh', overflow: 'hidden' }}>
+      {/* Header */}
       <motion.header
         initial={{ y: -100 }}
         animate={{ y: 0 }}
@@ -108,15 +147,15 @@ export default function Home() {
           right: 0,
           zIndex: 50,
           backdropFilter: 'blur(12px)',
-          backgroundColor: 'rgba(22,22,24,0.7)',
-          borderBottom: '1px solid rgba(255,255,255,0.08)',
+          backgroundColor: t.headerBg,
+          borderBottom: `1px solid ${t.border}`,
           boxShadow: '0px 1px 2px 0px rgba(0,0,0,0.05)',
         }}
       >
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 48px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 80 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontFamily: 'var(--font-inter)', fontWeight: 700, fontSize: 24, color: '#ffb874' }}>
+              <span style={{ fontFamily: 'var(--font-inter)', fontWeight: 700, fontSize: 24, color: t.accent }}>
                 BitPath
               </span>
             </div>
@@ -131,14 +170,14 @@ export default function Home() {
                     fontWeight: 500,
                     fontSize: 14,
                     letterSpacing: '0.7px',
-                    color: i === 0 ? '#ffb874' : '#a1a1aa',
-                    borderBottom: i === 0 ? '2px solid #ffb874' : 'none',
+                    color: i === 0 ? t.accent : t.muted,
+                    borderBottom: i === 0 ? `2px solid ${t.accent}` : 'none',
                     paddingBottom: i === 0 ? 6 : 0,
                     textDecoration: 'none',
                     transition: 'color 0.2s',
                   }}
-                  onMouseEnter={(e) => { if (i !== 0) e.currentTarget.style.color = '#e5e2e3'; }}
-                  onMouseLeave={(e) => { if (i !== 0) e.currentTarget.style.color = '#a1a1aa'; }}
+                  onMouseEnter={(e) => { if (i !== 0) e.currentTarget.style.color = t.textSecondary; }}
+                  onMouseLeave={(e) => { if (i !== 0) e.currentTarget.style.color = t.muted; }}
                 >
                   {link}
                 </a>
@@ -151,15 +190,43 @@ export default function Home() {
                 gap: 4,
                 padding: 5,
                 borderRadius: 9999,
-                border: '1px solid rgba(255,255,255,0.08)',
-                backgroundColor: 'rgba(28,27,28,0.5)',
+                border: `1px solid ${t.border}`,
+                backgroundColor: t.navActiveBg,
                 backdropFilter: 'blur(6px)',
               }}>
-                <div style={{ width: 32, height: 32, borderRadius: '50%', backgroundColor: '#ffb874', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                <div
+                  onClick={() => setIsDark(false)}
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: '50%',
+                    backgroundColor: !isDark ? t.accent : 'transparent',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: !isDark ? '#2d1600' : t.muted,
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  <SunIcon size={16} />
                 </div>
-                <div style={{ width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" strokeWidth="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                <div
+                  onClick={() => setIsDark(true)}
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: '50%',
+                    backgroundColor: isDark ? t.accent : 'transparent',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: isDark ? '#2d1600' : t.muted,
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  <MoonIcon size={14} />
                 </div>
               </div>
 
@@ -168,7 +235,7 @@ export default function Home() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 style={{
-                  backgroundColor: '#8c4f00',
+                  backgroundColor: t.accentMuted,
                   color: 'white',
                   border: 'none',
                   borderRadius: 9999,
@@ -210,14 +277,14 @@ export default function Home() {
                 gap: 8,
                 padding: '7px 17px',
                 borderRadius: 9999,
-                border: '1px solid rgba(255,255,255,0.08)',
-                backgroundColor: 'rgba(22,22,24,0.7)',
+                border: `1px solid ${t.border}`,
+                backgroundColor: t.cardBg,
                 backdropFilter: 'blur(10px)',
-                boxShadow: 'inset 0px 1px 1px 0px rgba(255,255,255,0.05)',
+                boxShadow: t.shadow,
                 marginBottom: 32,
               }}>
-                <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#ffb874' }} />
-                <span style={{ fontFamily: 'var(--font-inter)', fontWeight: 500, fontSize: 12, letterSpacing: '1.2px', textTransform: 'uppercase', color: '#ffb874' }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: t.accent }} />
+                <span style={{ fontFamily: 'var(--font-inter)', fontWeight: 500, fontSize: 12, letterSpacing: '1.2px', textTransform: 'uppercase', color: t.accent }}>
                   Powered by Nostr & Lightning
                 </span>
               </div>
@@ -230,7 +297,7 @@ export default function Home() {
                 fontSize: 64,
                 lineHeight: '72px',
                 letterSpacing: '-1.28px',
-                color: 'white',
+                color: t.text,
                 textAlign: 'center',
                 margin: 0,
               }}>
@@ -244,7 +311,7 @@ export default function Home() {
                 fontWeight: 400,
                 fontSize: 18,
                 lineHeight: '28px',
-                color: '#a1a1aa',
+                color: t.muted,
                 textAlign: 'center',
                 margin: 0,
               }}>
@@ -260,7 +327,7 @@ export default function Home() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   style={{
-                    backgroundColor: '#f7931a',
+                    backgroundColor: t.accentDark,
                     color: '#2d1600',
                     border: 'none',
                     borderRadius: 9999,
@@ -280,9 +347,9 @@ export default function Home() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   style={{
-                    backgroundColor: 'rgba(22,22,24,0.7)',
-                    color: 'white',
-                    border: '1px solid rgba(255,255,255,0.08)',
+                    backgroundColor: t.cardBg,
+                    color: t.text,
+                    border: `1px solid ${t.border}`,
                     borderRadius: 9999,
                     padding: '18px 41px',
                     fontFamily: 'var(--font-inter)',
@@ -305,17 +372,17 @@ export default function Home() {
                 width: 900,
                 maxWidth: 900,
                 borderRadius: 32,
-                border: '1px solid rgba(255,255,255,0.08)',
-                backgroundColor: 'rgba(22,22,24,0.7)',
+                border: `1px solid ${t.border}`,
+                backgroundColor: t.cardBg,
                 backdropFilter: 'blur(10px)',
                 padding: 9,
                 boxShadow: '0px 25px 50px -12px rgba(0,0,0,0.25)',
               }}
             >
-              <div style={{ backgroundColor: '#201f20', borderRadius: 28, overflow: 'hidden' }}>
+              <div style={{ backgroundColor: t.chatBg, borderRadius: 28, overflow: 'hidden' }}>
                 <div style={{
-                  backgroundColor: '#2a2a2b',
-                  borderBottom: '1px solid rgba(255,255,255,0.08)',
+                  backgroundColor: t.chatBorder,
+                  borderBottom: `1px solid ${t.border}`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
@@ -323,10 +390,10 @@ export default function Home() {
                 }}>
                   <div style={{ display: 'flex', gap: 6 }}>
                     <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#ffb4ab', opacity: 0.4 }} />
-                    <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#ffb874', opacity: 0.4 }} />
+                    <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: t.accent, opacity: 0.4 }} />
                     <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#ffb869', opacity: 0.4 }} />
                   </div>
-                  <span style={{ fontFamily: 'var(--font-inter)', fontWeight: 500, fontSize: 14, letterSpacing: '0.7px', color: '#a1a1aa' }}>
+                  <span style={{ fontFamily: 'var(--font-inter)', fontWeight: 500, fontSize: 14, letterSpacing: '0.7px', color: t.muted }}>
                     AI Tutor: Bitcoin 101
                   </span>
                   <div />
@@ -339,7 +406,7 @@ export default function Home() {
                       width: 40,
                       height: 40,
                       borderRadius: '50%',
-                      backgroundColor: '#ffb874',
+                      backgroundColor: t.accent,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -351,12 +418,12 @@ export default function Home() {
                       </svg>
                     </div>
                     <div style={{
-                      backgroundColor: '#2a2a2b',
+                      backgroundColor: t.aiMessageBg,
                       padding: 16,
                       borderRadius: '0 48px 48px 48px',
                       maxWidth: 512,
                     }}>
-                      <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 400, fontSize: 16, lineHeight: '24px', color: '#e5e2e3', margin: 0 }}>
+                      <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 400, fontSize: 16, lineHeight: '24px', color: t.textSecondary, margin: 0 }}>
                         What is the Lightning Network? Think of it as a second layer on top of Bitcoin that makes payments instant and cheap!
                       </p>
                     </div>
@@ -365,26 +432,26 @@ export default function Home() {
                   {/* User Message */}
                   <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', paddingLeft: 250 }}>
                     <div style={{
-                      border: '1px solid rgba(255,255,255,0.08)',
+                      border: `1px solid ${t.border}`,
                       padding: 17,
                       borderRadius: '48px 48px 0 48px',
                       maxWidth: 512,
                     }}>
-                      <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 400, fontSize: 16, lineHeight: '24px', color: '#e5e2e3', margin: 0 }}>
-                        Wait, so it's not on the main blockchain for every coffee purchase?
+                      <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 400, fontSize: 16, lineHeight: '24px', color: t.textSecondary, margin: 0 }}>
+                        Wait, so it&apos;s not on the main blockchain for every coffee purchase?
                       </p>
                     </div>
                     <div style={{
                       width: 40,
                       height: 40,
                       borderRadius: '50%',
-                      border: '1px solid rgba(255,255,255,0.08)',
+                      border: `1px solid ${t.border}`,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       flexShrink: 0,
                     }}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" strokeWidth="2">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={t.muted} strokeWidth="2">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                         <circle cx="12" cy="7" r="4"/>
                       </svg>
@@ -397,7 +464,7 @@ export default function Home() {
                       width: 40,
                       height: 40,
                       borderRadius: '50%',
-                      backgroundColor: '#ffb874',
+                      backgroundColor: t.accent,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -408,7 +475,7 @@ export default function Home() {
                       </svg>
                     </div>
                     <div style={{
-                      backgroundColor: '#2a2a2b',
+                      backgroundColor: t.aiMessageBg,
                       padding: 16,
                       borderRadius: '0 48px 48px 48px',
                       maxWidth: 512,
@@ -416,35 +483,35 @@ export default function Home() {
                       flexDirection: 'column',
                       gap: 8,
                     }}>
-                      <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 700, fontSize: 16, lineHeight: '24px', color: '#ffb874', margin: 0 }}>
-                        Pop Quiz! ⚡
+                      <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 700, fontSize: 16, lineHeight: '24px', color: t.accent, margin: 0 }}>
+                        Pop Quiz!
                       </p>
-                      <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 400, fontSize: 16, lineHeight: '24px', color: '#e5e2e3', margin: 0 }}>
+                      <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 400, fontSize: 16, lineHeight: '24px', color: t.textSecondary, margin: 0 }}>
                         Does the Lightning Network settle every transaction immediately on the Bitcoin mainnet?
                       </p>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingTop: 8 }}>
                         <div style={{
-                          backgroundColor: 'rgba(10,10,11,0.5)',
-                          border: '1px solid rgba(255,255,255,0.08)',
+                          backgroundColor: t.quizOptionBg,
+                          border: `1px solid ${t.border}`,
                           borderRadius: 32,
                           padding: '9px 17px',
-                          color: '#e5e2e3',
+                          color: t.textSecondary,
                           fontFamily: 'var(--font-inter)',
                           fontSize: 16,
                           cursor: 'pointer',
                           transition: 'all 0.2s',
                         }}
-                          onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#ffb874'; e.currentTarget.style.backgroundColor = 'rgba(255,184,116,0.1)'; }}
-                          onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.backgroundColor = 'rgba(10,10,11,0.5)'; }}
+                          onMouseEnter={(e) => { e.currentTarget.style.borderColor = t.accent; e.currentTarget.style.backgroundColor = 'rgba(255,184,116,0.1)'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.borderColor = t.border; e.currentTarget.style.backgroundColor = t.quizOptionBg; }}
                         >
                           A) Yes, every single one.
                         </div>
                         <div style={{
                           backgroundColor: 'rgba(255,184,116,0.1)',
-                          border: '1px solid #ffb874',
+                          border: `1px solid ${t.accent}`,
                           borderRadius: 32,
                           padding: '9px 17px',
-                          color: '#e5e2e3',
+                          color: t.textSecondary,
                           fontFamily: 'var(--font-inter)',
                           fontSize: 16,
                         }}>
@@ -462,29 +529,29 @@ export default function Home() {
                 top: -40,
                 right: -40,
                 borderRadius: 32,
-                border: '1px solid rgba(255,255,255,0.08)',
-                backgroundColor: 'rgba(22,22,24,0.7)',
+                border: `1px solid ${t.border}`,
+                backgroundColor: t.streakBg,
                 backdropFilter: 'blur(10px)',
                 padding: 25,
-                boxShadow: 'inset 0px 1px 1px 0px rgba(255,255,255,0.05)',
+                boxShadow: t.shadow,
               }}>
                 <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
                   <div style={{
                     width: 48,
                     height: 48,
                     borderRadius: '50%',
-                    backgroundColor: 'rgba(255,184,105,0.2)',
+                    backgroundColor: t.bitcoinBg,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffb874"><circle cx="12" cy="12" r="10"/><path d="M8 12l2 2 4-4" stroke="#2d1600" strokeWidth="2" fill="none"/></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill={t.accent}><circle cx="12" cy="12" r="10"/><path d="M8 12l2 2 4-4" stroke="#2d1600" strokeWidth="2" fill="none"/></svg>
                   </div>
                   <div>
-                    <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 500, fontSize: 12, textTransform: 'uppercase', color: '#a1a1aa', margin: 0, letterSpacing: '0.5px' }}>
+                    <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 500, fontSize: 12, textTransform: 'uppercase', color: t.muted, margin: 0, letterSpacing: '0.5px' }}>
                       REWARD EARNED
                     </p>
-                    <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 700, fontSize: 24, color: '#ffb874', margin: 0 }}>
+                    <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 700, fontSize: 24, color: t.accent, margin: 0 }}>
                       +50 Sats
                     </p>
                   </div>
@@ -497,21 +564,21 @@ export default function Home() {
                 bottom: -24,
                 left: -40,
                 borderRadius: 32,
-                border: '1px solid rgba(255,255,255,0.08)',
-                backgroundColor: 'rgba(22,22,24,0.7)',
+                border: `1px solid ${t.border}`,
+                backgroundColor: t.streakBg,
                 backdropFilter: 'blur(10px)',
                 padding: 21,
-                boxShadow: 'inset 0px 1px 1px 0px rgba(255,255,255,0.05)',
+                boxShadow: t.shadow,
               }}>
                 <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                  <svg width="24" height="32" viewBox="0 0 24 24" fill="none" stroke="#ffb874" strokeWidth="2">
+                  <svg width="24" height="32" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="2">
                     <polygon points="13 2 15 9 22 9 16 14 18 21 12 17 6 21 8 14 2 9 9 9 11 2"/>
                   </svg>
                   <div>
-                    <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 700, fontSize: 16, color: 'white', margin: 0 }}>
+                    <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 700, fontSize: 16, color: t.text, margin: 0 }}>
                       7-Day Streak!
                     </p>
-                    <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 500, fontSize: 12, color: '#a1a1aa', margin: 0 }}>
+                    <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 500, fontSize: 12, color: t.muted, margin: 0 }}>
                       Multiplier Active 1.2x
                     </p>
                   </div>
@@ -523,63 +590,69 @@ export default function Home() {
 
         {/* Features Bento Grid */}
         <section id="features" style={{ padding: '120px 48px', maxWidth: 1280, margin: '0 auto' }}>
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={{
-              hidden: { opacity: 0 },
-              visible: { transition: { staggerChildren: 0.1 } },
-            }}
-            style={{ display: 'flex', flexDirection: 'column', gap: 80 }}
-          >
-            <div style={{ textAlign: 'center' }}>
-              <motion.h2 variants={fadeIn} style={{
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 80 }}>
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              style={{ textAlign: 'center' }}
+            >
+              <h2 style={{
                 fontFamily: 'var(--font-inter)',
                 fontWeight: 600,
                 fontSize: 40,
                 lineHeight: '48px',
                 letterSpacing: '-0.4px',
-                color: 'white',
+                color: t.text,
                 margin: '0 0 16px',
               }}>
                 Redefining Education for the Digital Age
-              </motion.h2>
-              <motion.p variants={fadeIn} style={{
+              </h2>
+              <p style={{
                 fontFamily: 'var(--font-inter)',
                 fontWeight: 400,
                 fontSize: 18,
                 lineHeight: '28px',
-                color: '#a1a1aa',
+                color: t.muted,
                 margin: 0,
                 maxWidth: 672,
                 marginLeft: 'auto',
                 marginRight: 'auto',
               }}>
                 Master the future of money through an experience designed for clarity, speed, and fun.
-              </motion.p>
-            </div>
+              </p>
+            </motion.div>
 
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: 24,
-              gridAutoRows: 'auto',
-            }}>
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: 24,
+                gridAutoRows: 'auto',
+              }}
+            >
               {features.map((feature, i) => (
                 <motion.div
                   key={i}
-                  variants={itemVariants}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.1 * i }}
                   style={{
                     gridColumn: feature.colSpan,
                     position: 'relative',
                     borderRadius: 32,
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    backgroundColor: 'rgba(22,22,24,0.7)',
+                    border: `1px solid ${t.border}`,
+                    backgroundColor: t.cardBg,
                     backdropFilter: 'blur(10px)',
                     padding: 41,
                     overflow: feature.graphic ? 'hidden' : 'visible',
-                    boxShadow: 'inset 0px 1px 1px 0px rgba(255,255,255,0.05)',
+                    boxShadow: t.shadow,
                     ...(feature.title === 'Conversational AI Learning' ? { gridRow: 'span 1' } : {}),
                   }}
                 >
@@ -591,7 +664,7 @@ export default function Home() {
                       width: 256,
                       height: 256,
                       borderRadius: '50%',
-                      backgroundColor: 'rgba(255,184,116,0.05)',
+                      backgroundColor: t.glowBg,
                       filter: 'blur(32px)',
                       pointerEvents: 'none',
                     }} />
@@ -606,7 +679,7 @@ export default function Home() {
                     fontWeight: 600,
                     fontSize: 24,
                     lineHeight: '32px',
-                    color: '#e5e2e3',
+                    color: t.textSecondary,
                     margin: '0 0 8px',
                   }}>
                     {feature.title}
@@ -617,7 +690,7 @@ export default function Home() {
                     fontWeight: 400,
                     fontSize: 16,
                     lineHeight: '24px',
-                    color: '#a1a1aa',
+                    color: t.muted,
                     margin: 0,
                   }}>
                     {feature.description}
@@ -626,7 +699,7 @@ export default function Home() {
                   {feature.graphic && (
                     <div style={{
                       marginTop: 16,
-                      backgroundColor: '#2a2a2b',
+                      backgroundColor: t.chatBorder,
                       borderRadius: 48,
                       padding: '24px 16px 16px',
                       height: 136,
@@ -637,7 +710,7 @@ export default function Home() {
                       zIndex: 1,
                     }}>
                       <div style={{ height: 16, width: '80%', borderRadius: 9999, backgroundColor: 'rgba(255,184,116,0.2)' }} />
-                      <div style={{ height: 16, width: '60%', borderRadius: 9999, backgroundColor: 'rgba(255,255,255,0.08)' }} />
+                      <div style={{ height: 16, width: '60%', borderRadius: 9999, backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)' }} />
                       <div style={{ height: 16, width: '90%', borderRadius: 9999, backgroundColor: 'rgba(255,184,116,0.2)' }} />
                     </div>
                   )}
@@ -654,14 +727,14 @@ export default function Home() {
                           width: 64,
                           height: 64,
                           borderRadius: '50%',
-                          border: `2px solid ${i < 3 ? '#ffb874' : 'rgba(255,255,255,0.08)'}`,
+                          border: `2px solid ${i < 3 ? t.accent : t.border}`,
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           fontFamily: 'var(--font-inter)',
                           fontWeight: 700,
                           fontSize: 16,
-                          color: i < 3 ? '#ffb874' : '#a1a1aa',
+                          color: i < 3 ? t.accent : t.muted,
                         }}>
                           {letter}
                         </div>
@@ -670,13 +743,13 @@ export default function Home() {
                   )}
                 </motion.div>
               ))}
-            </div>
-          </motion.div>
+              </motion.div>
+          </div>
         </section>
 
         {/* How It Works */}
         <section id="how-it-works" style={{
-          backgroundColor: '#1c1b1c',
+          backgroundColor: t.sectionBg,
           padding: '128px 48px',
           overflow: 'hidden',
         }}>
@@ -686,14 +759,14 @@ export default function Home() {
             viewport={{ once: true }}
             style={{ maxWidth: 1280, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 96 }}
           >
-            <div style={{ textAlign: 'center' }}>
+            <motion.div variants={fadeIn} style={{ textAlign: 'center' }}>
               <motion.h2 variants={fadeIn} style={{
                 fontFamily: 'var(--font-inter)',
                 fontWeight: 600,
                 fontSize: 40,
                 lineHeight: '48px',
                 letterSpacing: '-0.4px',
-                color: 'white',
+                color: t.text,
                 margin: '0 0 16px',
               }}>
                 The BitPath Journey
@@ -703,12 +776,12 @@ export default function Home() {
                 fontWeight: 400,
                 fontSize: 18,
                 lineHeight: '28px',
-                color: '#a1a1aa',
+                color: t.muted,
                 margin: 0,
               }}>
                 Five simple steps to mastery.
               </motion.p>
-            </div>
+            </motion.div>
 
             <motion.div variants={fadeIn} style={{
               display: 'flex',
@@ -722,7 +795,7 @@ export default function Home() {
                 left: 0,
                 right: 0,
                 height: 2,
-                background: 'linear-gradient(to right, rgba(255,184,116,0), rgba(255,184,116,0.3), rgba(255,184,116,0))',
+                background: `linear-gradient(to right, transparent, ${t.accent}44, transparent)`,
                 transform: 'translateY(-50%)',
               }} />
 
@@ -732,23 +805,22 @@ export default function Home() {
                     width: 80,
                     height: 80,
                     borderRadius: '50%',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    backgroundColor: 'rgba(22,22,24,0.7)',
+                    border: `1px solid ${t.border}`,
+                    backgroundColor: t.cardBg,
                     backdropFilter: 'blur(10px)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: 24,
                     marginBottom: 32,
-                    boxShadow: 'inset 0px 1px 1px 0px rgba(255,255,255,0.05)',
+                    boxShadow: t.shadow,
                   }}>
-                    {step.icon}
+                    <step.icon size={28} color={t.accent} />
                   </div>
                   <h4 style={{
                     fontFamily: 'var(--font-inter)',
                     fontWeight: 600,
                     fontSize: 24,
-                    color: '#e5e2e3',
+                    color: t.textSecondary,
                     margin: '0 0 8px',
                   }}>
                     {step.title}
@@ -757,7 +829,7 @@ export default function Home() {
                     fontFamily: 'var(--font-inter)',
                     fontWeight: 500,
                     fontSize: 12,
-                    color: '#a1a1aa',
+                    color: t.muted,
                     margin: 0,
                     textAlign: 'center',
                   }}>
@@ -790,7 +862,7 @@ export default function Home() {
                 fontSize: 40,
                 lineHeight: '48px',
                 letterSpacing: '-0.4px',
-                color: 'white',
+                color: t.text,
                 margin: '0 0 32px',
               }}>
                 What do you want to master<br />first?
@@ -804,25 +876,26 @@ export default function Home() {
                 {topics.map((topic, i) => (
                   <div key={i} style={{
                     borderRadius: 32,
-                    border: `1px solid ${topic.dashed ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.08)'}`,
+                    borderWidth: 1,
                     borderStyle: topic.dashed ? 'dashed' : 'solid',
-                    backgroundColor: 'rgba(22,22,24,0.7)',
+                    borderColor: t.border,
+                    backgroundColor: t.cardBg,
                     backdropFilter: 'blur(10px)',
                     padding: 25,
-                    boxShadow: 'inset 0px 1px 1px 0px rgba(255,255,255,0.05)',
+                    boxShadow: t.shadow,
                     cursor: topic.dashed ? 'default' : 'pointer',
                     transition: 'border-color 0.2s',
                   }}
-                    onMouseEnter={(e) => { if (!topic.dashed) e.currentTarget.style.borderColor = '#ffb874'; }}
-                    onMouseLeave={(e) => { if (!topic.dashed) e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}
+                    onMouseEnter={(e) => { if (!topic.dashed) e.currentTarget.style.borderColor = t.accent; }}
+                    onMouseLeave={(e) => { if (!topic.dashed) e.currentTarget.style.borderColor = t.border; }}
                   >
                     <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-                      <span style={{ fontSize: 18 }}>{topic.icon}</span>
+                      <TopicIconComponent icon={topic.icon} dashed={topic.dashed} />
                       <span style={{
                         fontFamily: 'var(--font-inter)',
                         fontWeight: 700,
                         fontSize: 16,
-                        color: topic.dashed ? '#a1a1aa' : '#e5e2e3',
+                        color: topic.dashed ? t.muted : t.textSecondary,
                       }}>
                         {topic.name}
                       </span>
@@ -837,12 +910,12 @@ export default function Home() {
               variants={fadeIn}
               style={{
                 borderRadius: 32,
-                border: '1px solid rgba(255,255,255,0.08)',
-                backgroundColor: 'rgba(22,22,24,0.7)',
+                border: `1px solid ${t.border}`,
+                backgroundColor: t.cardBg,
                 backdropFilter: 'blur(10px)',
                 padding: 41,
                 overflow: 'hidden',
-                boxShadow: 'inset 0px 1px 1px 1px rgba(255,255,255,0.05)',
+                boxShadow: t.shadow,
               }}
             >
               <h3 style={{
@@ -850,7 +923,7 @@ export default function Home() {
                 fontWeight: 600,
                 fontSize: 24,
                 lineHeight: '32px',
-                color: '#e5e2e3',
+                color: t.textSecondary,
                 margin: '0 0 32px',
               }}>
                 Your Stats
@@ -864,39 +937,39 @@ export default function Home() {
                       width: 56,
                       height: 56,
                       borderRadius: '50%',
-                      border: '1px solid rgba(255,184,116,0.3)',
-                      backgroundColor: 'rgba(22,22,24,0.7)',
+                      border: `1px solid ${isDark ? 'rgba(255,184,116,0.3)' : 'rgba(255,184,116,0.5)'}`,
+                      backgroundColor: t.cardBg,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       position: 'relative',
                     }}>
-                      <span style={{ fontFamily: 'var(--font-inter)', fontWeight: 700, fontSize: 12, color: '#e5e2e3' }}>75%</span>
+                      <span style={{ fontFamily: 'var(--font-inter)', fontWeight: 700, fontSize: 12, color: t.textSecondary }}>75%</span>
                     </div>
                     <div>
-                      <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 700, fontSize: 16, color: '#e5e2e3', margin: 0 }}>Current Course</p>
-                      <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 500, fontSize: 12, color: '#a1a1aa', margin: 0 }}>Lightning Level 4</p>
+                      <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 700, fontSize: 16, color: t.textSecondary, margin: 0 }}>Current Course</p>
+                      <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 500, fontSize: 12, color: t.muted, margin: 0 }}>Lightning Level 4</p>
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 700, fontSize: 24, color: '#ffb874', margin: 0 }}>12,450</p>
-                    <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 500, fontSize: 12, color: '#a1a1aa', margin: 0 }}>Total XP</p>
+                    <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 700, fontSize: 24, color: t.accent, margin: 0 }}>12,450</p>
+                    <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 500, fontSize: 12, color: t.muted, margin: 0 }}>Total XP</p>
                   </div>
                 </div>
 
-                <div style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.08)' }} />
+                <div style={{ height: 1, backgroundColor: t.border }} />
 
                 {/* Total Earned */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                   <div>
-                    <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 500, fontSize: 12, textTransform: 'uppercase', color: '#a1a1aa', margin: '0 0 4px', letterSpacing: '0.5px' }}>
+                    <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 500, fontSize: 12, textTransform: 'uppercase', color: t.muted, margin: '0 0 4px', letterSpacing: '0.5px' }}>
                       TOTAL EARNED
                     </p>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-                      <span style={{ fontFamily: 'var(--font-inter)', fontWeight: 700, fontSize: 40, lineHeight: '48px', letterSpacing: '-0.4px', color: 'white' }}>
+                      <span style={{ fontFamily: 'var(--font-inter)', fontWeight: 700, fontSize: 40, lineHeight: '48px', letterSpacing: '-0.4px', color: t.text }}>
                         840,200
                       </span>
-                      <span style={{ fontFamily: 'var(--font-inter)', fontWeight: 600, fontSize: 24, lineHeight: '32px', color: '#ffb874' }}>
+                      <span style={{ fontFamily: 'var(--font-inter)', fontWeight: 600, fontSize: 24, lineHeight: '32px', color: t.accent }}>
                         Sats
                       </span>
                     </div>
@@ -907,8 +980,8 @@ export default function Home() {
                     borderRadius: 32,
                     padding: '9px 17px',
                   }}>
-                    <span style={{ fontFamily: 'var(--font-inter)', fontWeight: 700, fontSize: 16, color: '#ffb874' }}>
-                      ≈ $542.12
+                    <span style={{ fontFamily: 'var(--font-inter)', fontWeight: 700, fontSize: 16, color: t.accent }}>
+                      ~ $542.12
                     </span>
                   </div>
                 </div>
@@ -919,7 +992,7 @@ export default function Home() {
                     <div key={i} style={{
                       height: 40,
                       borderRadius: 6,
-                      backgroundColor: '#ffb874',
+                      backgroundColor: t.accent,
                       opacity: opacity / 100,
                     }} />
                   ))}
@@ -934,7 +1007,9 @@ export default function Home() {
           padding: '128px 48px',
           position: 'relative',
           overflow: 'hidden',
-          background: 'linear-gradient(to bottom, rgba(255,184,116,0), rgba(255,184,116,0.05), rgba(255,184,116,0))',
+          background: isDark
+            ? 'linear-gradient(to bottom, rgba(255,184,116,0), rgba(255,184,116,0.05), rgba(255,184,116,0))'
+            : 'linear-gradient(to bottom, rgba(255,184,116,0), rgba(255,184,116,0.03), rgba(255,184,116,0))',
         }}>
           <motion.div
             initial="hidden"
@@ -944,11 +1019,11 @@ export default function Home() {
               maxWidth: 1280,
               margin: '0 auto',
               borderRadius: 32,
-              backgroundColor: 'rgba(22,22,24,0.7)',
+              backgroundColor: t.cardBg,
               backdropFilter: 'blur(10px)',
               padding: 64,
               textAlign: 'center',
-              boxShadow: '0px 0px 100px 0px rgba(247,147,26,0.05)',
+              boxShadow: isDark ? '0px 0px 100px 0px rgba(247,147,26,0.05)' : '0px 0px 60px 0px rgba(247,147,26,0.05)',
             }}
           >
             <motion.h2 variants={fadeIn} style={{
@@ -957,7 +1032,7 @@ export default function Home() {
               fontSize: 64,
               lineHeight: '72px',
               letterSpacing: '-1.28px',
-              color: 'white',
+              color: t.text,
               margin: '0 0 24px',
             }}>
               Start your financial learning<br />journey today.
@@ -968,7 +1043,7 @@ export default function Home() {
               fontWeight: 400,
               fontSize: 18,
               lineHeight: '28px',
-              color: '#a1a1aa',
+              color: t.muted,
               margin: '0 auto 24px',
               maxWidth: 672,
             }}>
@@ -981,7 +1056,7 @@ export default function Home() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 style={{
-                  backgroundColor: '#f7931a',
+                  backgroundColor: t.accentDark,
                   color: '#2d1600',
                   border: 'none',
                   borderRadius: 9999,
@@ -1004,14 +1079,14 @@ export default function Home() {
               paddingTop: 24,
             }}>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <Check size={12} color="#a1a1aa" />
-                <span style={{ fontFamily: 'var(--font-inter)', fontWeight: 400, fontSize: 16, color: '#a1a1aa' }}>
+                <Check size={12} color={t.muted} />
+                <span style={{ fontFamily: 'var(--font-inter)', fontWeight: 400, fontSize: 16, color: t.muted }}>
                   No credit card required
                 </span>
               </div>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <Check size={12} color="#a1a1aa" />
-                <span style={{ fontFamily: 'var(--font-inter)', fontWeight: 400, fontSize: 16, color: '#a1a1aa' }}>
+                <Check size={12} color={t.muted} />
+                <span style={{ fontFamily: 'var(--font-inter)', fontWeight: 400, fontSize: 16, color: t.muted }}>
                   Instant rewards
                 </span>
               </div>
@@ -1022,18 +1097,18 @@ export default function Home() {
 
       {/* Footer */}
       <footer style={{
-        backgroundColor: '#0a0a0b',
-        borderTop: '1px solid rgba(255,255,255,0.08)',
+        backgroundColor: t.footerBg,
+        borderTop: `1px solid ${t.border}`,
         padding: '49px 48px 48px',
       }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <span style={{ fontFamily: 'var(--font-inter)', fontWeight: 600, fontSize: 24, color: '#ffb874' }}>
+              <span style={{ fontFamily: 'var(--font-inter)', fontWeight: 600, fontSize: 24, color: t.accent }}>
                 BitPath
               </span>
-              <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 400, fontSize: 16, color: '#a1a1aa', margin: 0 }}>
-                © 2026 BitPath. Empowering Hack4Freedom.
+              <p style={{ fontFamily: 'var(--font-inter)', fontWeight: 400, fontSize: 16, color: t.muted, margin: 0 }}>
+                &copy; 2026 BitPath. Empowering Hack4Freedom.
               </p>
             </div>
             <div style={{ display: 'flex', gap: 32 }}>
@@ -1045,12 +1120,12 @@ export default function Home() {
                     fontFamily: 'var(--font-inter)',
                     fontWeight: 400,
                     fontSize: 16,
-                    color: '#a1a1aa',
+                    color: t.muted,
                     textDecoration: 'none',
                     transition: 'color 0.2s',
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = '#e5e2e3'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}
+                  onMouseEnter={(e) => e.currentTarget.style.color = t.textSecondary}
+                  onMouseLeave={(e) => e.currentTarget.style.color = t.muted}
                 >
                   {link}
                 </a>
