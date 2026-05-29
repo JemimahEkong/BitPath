@@ -25,6 +25,7 @@ import { AuthModule } from './auth.module';
 import { ConversationsModule } from './conversations/conversations.module';
 import { MessageModule } from './message/message.module';
 import { AiModule } from './ai/ai.module';
+import { QuizzesModule } from './quizzes/quizzes.module';
 import { RewardsModule } from './rewards/rewards.module';
 
 
@@ -59,6 +60,7 @@ import { RewardsModule } from './rewards/rewards.module';
     ConversationsModule,
     MessageModule,
     AiModule,
+    QuizzesModule,
     RewardsModule
   ],
   controllers: [AppController],

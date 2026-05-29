@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   Controller,
   Post,
-  Get,
   Body,
   HttpCode,
   HttpStatus,
@@ -11,9 +9,7 @@ import {
   UsePipes,
   Req,
   Res,
-  UseGuards,
 } from '@nestjs/common';
-import { SessionGuard } from './guards/session.guard';
 import { Throttle } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
 
@@ -30,24 +26,6 @@ export class UsersController {
     private readonly userService: UsersService,
     private readonly sessionService: SessionService,
   ) {}
-
-  @Get('profile')
-  @UseGuards(SessionGuard)
-  async getProfile(@Req() req: Request) {
-    const userId = (req as any).user.id;
-    const user = await this.userService.prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        email: true,
-        totalXp: true,
-        totalSatoshiEarned: true,
-        quizQuestionCount: true,
-        passedQuizCount: true,
-      },
-    });
-    return { success: true, data: user };
-  }
 
   @Post('signup')
   @HttpCode(HttpStatus.CREATED)

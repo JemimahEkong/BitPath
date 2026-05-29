@@ -32,7 +32,7 @@ export class UsersService {
   >();
 
   constructor(
-    public readonly prisma: PrismaService,
+    private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
     private readonly sessionService: SessionService,
     private readonly cacheService: CacheService,

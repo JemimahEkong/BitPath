@@ -33,6 +33,8 @@ export interface LoginResponse {
       id: string;
       email: string;
       isEmailVerified: boolean;
+      totalXp?: number;
+      totalSatoshiEarned?: number;
     };
   };
   errorCode?: string;
@@ -118,6 +120,8 @@ export class SessionService {
             id: user.id,
             email: user.email,
             isEmailVerified: user.isEmailVerified,
+            totalXp: user.totalXp,
+            totalSatoshiEarned: user.totalSatoshiEarned,
           },
         },
       };

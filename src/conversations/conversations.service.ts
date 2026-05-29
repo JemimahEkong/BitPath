@@ -37,18 +37,9 @@ export class ConversationsService {
   }
 
   async getConversationsByUserId(userId: string): Promise<Conversation[]> {
-    const conversations = await this.prisma.conversation.findMany({
+    return this.prisma.conversation.findMany({
       where: { userId, isArchived: false },
       orderBy: { lastMessageAt: 'desc' },
-    });
-    
-    // Sort: uncompleted quizzes first, then completed quizzes at the bottom
-    return conversations.sort((a, b) => {
-      // If one is completed and the other isn't, completed goes to bottom
-      if (a.quizPassed && !b.quizPassed) return 1;
-      if (!a.quizPassed && b.quizPassed) return -1;
-      // If both same status, sort by lastMessageAt descending (newest first)
-      return new Date(b.lastMessageAt || b.createdAt).getTime() - new Date(a.lastMessageAt || a.createdAt).getTime();
     });
   }
 
@@ -136,18 +127,6 @@ export class ConversationsService {
   async clearRecentMessagesCache(conversationId: string): Promise<void> {
     const key = this.getCacheKeyForRecentMessages(conversationId);
     await this.cacheService.deleteCacheKey(key);
-  }
-
-  async incrementMessageCount(conversationId: string): Promise<Conversation> {
-    return this.prisma.conversation.update({
-      where: { id: conversationId },
-      data: { totalMessages: { increment: 1 }, lastMessageAt: new Date() },
-    });
-  }
-
-  async isQuizReady(conversationId: string): Promise<boolean> {
-    const conversation = await this.getConversationById(conversationId);
-    return conversation.totalMessages >= 10;
   }
 
   // Optional: Clean up subjects when a conversation ends or is archived/deleted

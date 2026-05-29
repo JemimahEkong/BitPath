@@ -78,11 +78,10 @@ export class AuthCheckController {
         id: true,
         email: true,
         isEmailVerified: true,
+        totalXp: true,
+        totalSatoshiEarned: true,
       },
     });
-
-
-
 
     return {
       success: true,
@@ -91,9 +90,11 @@ export class AuthCheckController {
         user: {
           id: freshUserData?.id,
           email: freshUserData?.email,
-          isEmailVerified: freshUserData?.isEmailVerified
-        }
-      }
+          isEmailVerified: freshUserData?.isEmailVerified,
+          totalXp: freshUserData?.totalXp,
+          totalSatoshiEarned: freshUserData?.totalSatoshiEarned,
+        },
+      },
     };
   }
 

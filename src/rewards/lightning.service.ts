@@ -26,6 +26,7 @@ import type {
 import {
   LightningPaymentDirection,
   LightningPaymentStatus,
+  Reward,
   WithdrawalStatus,
 } from 'generated/prisma/client';
 import { PrismaService } from 'src/database/database.service';
@@ -971,5 +972,23 @@ export class LightningService implements OnModuleDestroy {
       take: 50,
     });
     return this.serializeForJson(withdrawals);
+  }
+
+  async getUnclaimedRewards(userId: string) {
+    await this.assertUserExists(userId);
+    const rewards = await this.prisma.reward.findMany({
+      where: { userId, claimed: false },
+      orderBy: { createdAt: 'desc' },
+    });
+    return rewards;
+  }
+
+  async claimAllRewards(userId: string) {
+    await this.assertUserExists(userId);
+    const result = await this.prisma.reward.updateMany({
+      where: { userId, claimed: false },
+      data: { claimed: true, claimedAt: new Date() },
+    });
+    return { success: true, claimedCount: result.count };
   }
 }

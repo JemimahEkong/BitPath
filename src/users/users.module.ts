@@ -9,6 +9,5 @@ import { AuthCheckController } from './check/auth-check.controller';
 @Module({
   controllers: [UsersController, PassportOAuthController, AuthCheckController],
   providers: [UsersService, SessionService, CacheService],
-  exports: [SessionService],
 })
 export class UsersModule {}

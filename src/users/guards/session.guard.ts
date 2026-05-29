@@ -40,6 +40,8 @@ export class SessionGuard {
           email: true,
           isEmailVerified: true,
           isActive: true,
+          totalXp: true,
+          totalSatoshiEarned: true,
         },
       });
 
