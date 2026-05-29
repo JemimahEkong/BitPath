@@ -46,6 +46,6 @@ import { TwitterOAuthStrategy } from './users/strategies/twitter.strategy';
     UsersService,
   ],
   controllers: [PassportOAuthController],
-  exports: [SessionGuard],
+  exports: [SessionGuard, SessionService],
 })
 export class AuthModule {}
