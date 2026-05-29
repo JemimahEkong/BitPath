@@ -421,6 +421,15 @@ export default function DashboardPage() {
     }
   }, [inputValue, isLoading, currentConversation, cleanup, setupSSE]);
 
+  const handleLogout = useCallback(async () => {
+    try {
+      await fetch('/api/auth/logOut', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+    } catch {
+      // proceed to redirect even if logout fails
+    }
+    window.location.href = '/login';
+  }, []);
+
   const newChat = useCallback(() => {
     cleanup();
     sseActiveRef.current = false;
@@ -542,6 +551,7 @@ export default function DashboardPage() {
         onSelectConversation={(conv) => { selectConversation(conv); setSidebarOpen(false); }}
         onNewChat={() => { newChat(); setSidebarOpen(false); }}
         onClaimRewards={claimAllRewards}
+        onLogout={handleLogout}
         isMobileOpen={sidebarOpen}
         onToggleMobile={() => setSidebarOpen(false)}
       />

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import type { Conversation, User } from './types';
 
 const styles = {
@@ -272,6 +273,16 @@ function StarIcon() {
   );
 }
 
+function LogoutIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <polyline points="16 17 21 12 16 7" />
+      <line x1="21" y1="12" x2="9" y2="12" />
+    </svg>
+  );
+}
+
 function formatChatDate(dateStr?: string): string {
   if (!dateStr) return '';
   const date = new Date(dateStr);
@@ -293,6 +304,7 @@ interface SidebarProps {
   onSelectConversation: (conv: Conversation) => void;
   onNewChat: () => void;
   onClaimRewards: () => void;
+  onLogout: () => void;
   isMobileOpen: boolean;
   onToggleMobile: () => void;
 }
@@ -306,10 +318,13 @@ export default function Sidebar({
   onSelectConversation,
   onNewChat,
   onClaimRewards,
+  onLogout,
   isMobileOpen,
   onToggleMobile,
 }: SidebarProps) {
+  const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
+  const [showAllChats, setShowAllChats] = useState(false);
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -352,16 +367,19 @@ export default function Sidebar({
           <ChatIcon />
           New Chat
         </button>
-        <button style={styles.chatHistoryBtn}>
+        <button
+          style={styles.chatHistoryBtn}
+          onClick={() => setShowAllChats(!showAllChats)}
+        >
           <HistoryIcon />
-          Chat History
+          {showAllChats ? 'Show Recent' : 'Chat History'}
         </button>
 
         {/* Recent Chats */}
         <div style={{ marginTop: 8 }}>
           <div style={styles.recentLabel}>Recent Chats</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {conversations.slice(0, 10).map((conv) => (
+            {conversations.slice(0, showAllChats ? conversations.length : 10).map((conv) => (
               <button
                 key={conv.id}
                 style={{
@@ -393,6 +411,7 @@ export default function Sidebar({
             style={styles.walletItem}
             onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#F9FAFB'; }}
             onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+            onClick={() => router.push('/dashboard/rewards')}
           >
             <RewardsIcon />
             Rewards
@@ -401,6 +420,7 @@ export default function Sidebar({
             style={styles.walletItem}
             onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#F9FAFB'; }}
             onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+            onClick={() => router.push('/dashboard/transactions')}
           >
             <TransactionIcon />
             Transactions
@@ -409,6 +429,7 @@ export default function Sidebar({
             style={styles.walletItem}
             onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#F9FAFB'; }}
             onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+            onClick={() => router.push('/dashboard/withdraw')}
           >
             <WithdrawIcon />
             Withdraw BTC
@@ -427,7 +448,7 @@ export default function Sidebar({
           <span style={styles.userName}>
             {user?.email?.split('@')[0] || 'User'}
           </span>
-          <button style={styles.upgradeBtn}>
+          <button style={styles.upgradeBtn} onClick={() => router.push('/dashboard/upgrade')}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <StarIcon />
               Upgrade
@@ -460,6 +481,33 @@ export default function Sidebar({
             }
           </button>
         )}
+
+        {/* Logout Button */}
+        <button
+          onClick={onLogout}
+          style={{
+            width: '100%',
+            padding: '10px 12px',
+            background: 'none',
+            border: 'none',
+            borderRadius: 10,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            fontFamily: 'var(--font-inter)',
+            fontWeight: 500,
+            fontSize: 14,
+            color: '#ef4444',
+            textAlign: 'left' as const,
+            transition: 'background-color 0.2s',
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#FEF2F2'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+        >
+          <LogoutIcon />
+          Logout
+        </button>
       </div>
     </div>
     <style>{`
