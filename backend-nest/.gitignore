@@ -52,3 +52,12 @@ pids
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 /generated/prisma
+
+# env
+.env
+
+# breeze
+.breez-spark/
+
+# kiro
+.kiro/
