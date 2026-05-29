@@ -26,12 +26,14 @@ import type {
 import {
   LightningPaymentDirection,
   LightningPaymentStatus,
+  WithdrawalStatus,
 } from 'generated/prisma/client';
 import { PrismaService } from 'src/database/database.service';
 import { CreateLightningInvoiceDto } from './dto/create-lightning-invoice.dto';
 import { SendLightningPaymentDto } from './dto/send-lightning-payment.dto';
 import { RegisterLightningAddressDto } from './dto/register-lightning-address.dto';
 import { LightningAnalyticsQueryDto } from './dto/lightning-analytics-query.dto';
+import { WithdrawDto } from './dto/withdraw.dto';
 
 type SerializablePayment = ReturnType<LightningService['serializeForJson']>;
 
@@ -864,5 +866,110 @@ export class LightningService implements OnModuleDestroy {
         analytics.length
       ).toFixed(2),
     };
+  }
+
+  //////////////////////
+  // BALANCE & WITHDRAWAL
+  //////////////////////
+
+  async getUserBalance(userId: string) {
+    await this.assertUserExists(userId);
+    return this.computeUserBalance(userId);
+  }
+
+  private async computeUserBalance(userId: string) {
+    const rewardAgg = await this.prisma.reward.aggregate({
+      where: { userId },
+      _sum: { btcReward: true },
+    });
+    const totalEarnedSats = rewardAgg._sum.btcReward
+      ? BigInt(Math.floor(rewardAgg._sum.btcReward))
+      : BigInt(0);
+
+    const withdrawalAgg = await this.prisma.withdrawal.aggregate({
+      where: { userId, status: WithdrawalStatus.COMPLETED },
+      _sum: { amountSats: true },
+    });
+    const totalWithdrawnSats = withdrawalAgg._sum.amountSats ?? BigInt(0);
+
+    return {
+      userId,
+      totalEarnedSats: totalEarnedSats.toString(),
+      totalWithdrawnSats: totalWithdrawnSats.toString(),
+      availableBalance: (totalEarnedSats - totalWithdrawnSats).toString(),
+    };
+  }
+
+  async withdraw(dto: WithdrawDto) {
+    await this.assertUserExists(dto.userId);
+
+    const balance = await this.computeUserBalance(dto.userId);
+    if (BigInt(dto.amountSats) > BigInt(balance.availableBalance)) {
+      throw new BadRequestException(
+        `Insufficient balance. Available: ${balance.availableBalance} sats, Requested: ${dto.amountSats} sats`,
+      );
+    }
+
+    const withdrawal = await this.prisma.withdrawal.create({
+      data: {
+        userId: dto.userId,
+        amountSats: BigInt(dto.amountSats),
+        lightningInvoice: dto.lightningInvoice,
+        status: WithdrawalStatus.PROCESSING,
+      },
+    });
+
+    try {
+      const sendResult = await this.sendPayment({
+        userId: dto.userId,
+        paymentRequest: dto.lightningInvoice,
+        amountSats: dto.amountSats,
+        idempotencyKey: dto.idempotencyKey,
+        conversationId: undefined,
+        preferSpark: undefined,
+        reason: 'Withdrawal',
+      });
+
+      const paymentId = (sendResult as any).payment?.id as string | undefined;
+      const paymentHash = (sendResult as any).payment?.paymentHash as string | undefined;
+
+      await this.prisma.withdrawal.update({
+        where: { id: withdrawal.id },
+        data: {
+          status: WithdrawalStatus.COMPLETED,
+          paymentHash,
+          lightningPaymentId: paymentId,
+        },
+      });
+
+      await this.prisma.user.update({
+        where: { id: dto.userId },
+        data: {
+          totalSatsWithdrawn: { increment: BigInt(dto.amountSats) },
+        },
+      });
+
+      return this.serializeForJson({
+        success: true,
+        withdrawal: { ...withdrawal, status: WithdrawalStatus.COMPLETED },
+        payment: sendResult,
+      });
+    } catch (error) {
+      await this.prisma.withdrawal.update({
+        where: { id: withdrawal.id },
+        data: { status: WithdrawalStatus.FAILED },
+      });
+      throw error;
+    }
+  }
+
+  async getUserWithdrawals(userId: string) {
+    await this.assertUserExists(userId);
+    const withdrawals = await this.prisma.withdrawal.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    });
+    return this.serializeForJson(withdrawals);
   }
 }

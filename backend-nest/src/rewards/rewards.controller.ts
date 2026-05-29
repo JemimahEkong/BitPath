@@ -6,6 +6,7 @@ import { SendLightningPaymentDto } from './dto/send-lightning-payment.dto';
 import { RegisterLightningAddressDto } from './dto/register-lightning-address.dto';
 import { UpdateLightningAddressDto } from './dto/register-lightning-address.dto';
 import { LightningAnalyticsQueryDto } from './dto/lightning-analytics-query.dto';
+import { WithdrawDto } from './dto/withdraw.dto';
 import {
   LightningPaymentDirection,
   LightningPaymentStatus,
@@ -107,5 +108,24 @@ export class RewardsController {
   @Post('lightning/analytics/record-daily/:userId')
   recordDailyAnalytics(@Param('userId') userId: string) {
     return this.lightningService.recordDailyAnalytics(userId);
+  }
+
+  //////////////////////
+  // BALANCE & WITHDRAWAL
+  //////////////////////
+
+  @Post('withdraw')
+  withdraw(@Body() dto: WithdrawDto) {
+    return this.lightningService.withdraw(dto);
+  }
+
+  @Get('balance/:userId')
+  getBalance(@Param('userId') userId: string) {
+    return this.lightningService.getUserBalance(userId);
+  }
+
+  @Get('withdrawals/:userId')
+  getWithdrawals(@Param('userId') userId: string) {
+    return this.lightningService.getUserWithdrawals(userId);
   }
 }
