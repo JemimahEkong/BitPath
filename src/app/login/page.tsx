@@ -217,7 +217,13 @@ function LoginContent() {
   );
 }
 
+import { Suspense } from 'react';
+
 // Main component
 export default function LoginPage() {
-  return <LoginContent />;
+  return (
+    <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: 'var(--background-page)' }}>Loading...</div>}>
+      <LoginContent />
+    </Suspense>
+  );
 }

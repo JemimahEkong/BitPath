@@ -478,6 +478,7 @@ export default function DashboardPage() {
 
     cleanup();
     let conversationId: string;
+    let userMessage: Message | null = null;
 
     try {
       setIsLoading(true);
@@ -496,7 +497,7 @@ export default function DashboardPage() {
         conversationId = currentConversation.id;
       }
 
-      const userMessage: Message = {
+      userMessage = {
         id: Date.now().toString(),
         conversationId,
         role: 'USER',
@@ -508,7 +509,7 @@ export default function DashboardPage() {
         needsRetry: false,
       };
 
-      setMessages(prev => [...prev, userMessage]);
+      setMessages(prev => [...prev, userMessage!]);
       setInputValue('');
       
       // Increment total messages locally for immediate UI update
@@ -517,8 +518,8 @@ export default function DashboardPage() {
       // Show retry button after 5 seconds if no AI response
       pendingRetryTimerRef.current = setTimeout(() => {
         setMessages(prev => prev.map(m => {
-          if (m.id === userMessage.id) {
-            const userIndex = prev.findIndex(x => x.id === userMessage.id);
+          if (m.id === userMessage!.id) {
+            const userIndex = prev.findIndex(x => x.id === userMessage!.id);
             const hasAiReply = prev.slice(userIndex + 1).some(x => x.role === 'ASSISTANT');
             if (!hasAiReply) {
               return { ...m, needsRetry: true };
@@ -529,7 +530,7 @@ export default function DashboardPage() {
       }, 5000);
 
       await api.post(`/conversations/${conversationId}/messages`, {
-        content: userMessage.content,
+        content: userMessage!.content,
         role: 'USER',
         type: 'TEXT',
       });
@@ -543,7 +544,7 @@ export default function DashboardPage() {
       }
       // Add an error message and mark the user message for retry
       setMessages(prev => [
-        ...prev.map(m => m.id === userMessage.id ? { ...m, needsRetry: true } : m),
+        ...prev.map(m => m.id === userMessage!.id ? { ...m, needsRetry: true } : m),
         {
           id: (Date.now() + 1).toString(),
           conversationId,
