@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Conversation, User } from './types';
 
 const styles = {
@@ -13,6 +13,17 @@ const styles = {
     flexDirection: 'column',
     height: '100vh',
     overflow: 'hidden',
+  } as React.CSSProperties,
+  sidebarMobile: {
+    position: 'fixed' as const,
+    left: -260,
+    top: 0,
+    zIndex: 50,
+    transition: 'left 0.3s ease',
+    boxShadow: '4px 0 20px rgba(0,0,0,0.15)',
+  } as React.CSSProperties,
+  sidebarMobileOpen: {
+    left: 0,
   } as React.CSSProperties,
   topBar: {
     display: 'flex',
@@ -282,6 +293,8 @@ interface SidebarProps {
   onSelectConversation: (conv: Conversation) => void;
   onNewChat: () => void;
   onClaimRewards: () => void;
+  isMobileOpen: boolean;
+  onToggleMobile: () => void;
 }
 
 export default function Sidebar({
@@ -293,18 +306,45 @@ export default function Sidebar({
   onSelectConversation,
   onNewChat,
   onClaimRewards,
+  isMobileOpen,
+  onToggleMobile,
 }: SidebarProps) {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
   return (
-    <div style={styles.sidebar}>
-      {/* Top Bar - Logo + Menu */}
-      <div style={styles.topBar}>
-        <span style={styles.logo}>BitPath</span>
-        <button style={styles.hamburger}>
-          <div style={styles.hamburgerLine} />
-          <div style={styles.hamburgerLine} />
-          <div style={styles.hamburgerLine} />
-        </button>
-      </div>
+    <>
+      {/* Mobile overlay */}
+      {isMobileOpen && (
+        <div
+          onClick={onToggleMobile}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            zIndex: 40,
+          }}
+        />
+      )}
+      <div style={{
+        ...styles.sidebar,
+        ...(isMobile ? styles.sidebarMobile : {}),
+        ...(isMobile && isMobileOpen ? styles.sidebarMobileOpen : {}),
+      }}>
+        {/* Top Bar - Logo + Menu */}
+        <div style={styles.topBar}>
+          <span style={styles.logo}>BitPath</span>
+          <button style={styles.hamburger} onClick={isMobileOpen ? onToggleMobile : undefined}>
+            <div style={styles.hamburgerLine} />
+            <div style={styles.hamburgerLine} />
+            <div style={styles.hamburgerLine} />
+          </button>
+        </div>
 
       {/* Nav Section */}
       <div style={styles.navSection}>
@@ -422,5 +462,12 @@ export default function Sidebar({
         )}
       </div>
     </div>
+    <style>{`
+      @media (max-width: 768px) {
+        .sidebar-mobile { position: fixed !important; left: -260px !important; z-index: 50 !important; transition: left 0.3s ease !important; }
+        .sidebar-mobile-open { left: 0 !important; }
+      }
+    `}</style>
+  </>
   );
 }

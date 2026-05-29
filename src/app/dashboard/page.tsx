@@ -22,6 +22,8 @@ export default function DashboardPage() {
   const [unclaimedRewards, setUnclaimedRewards] = useState<any[]>([]);
   const [isClaimingRewards, setIsClaimingRewards] = useState(false);
 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   const [currentQuiz, setCurrentQuiz] = useState<QuizQuestion[] | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [quizAnswer, setQuizAnswer] = useState('');
@@ -481,6 +483,54 @@ export default function DashboardPage() {
     }}>
       <style>{`
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        @media (max-width: 768px) {
+          .dash-header { padding: 12px 16px !important; }
+          .dash-content-pad { padding: 16px !important; }
+          .dash-msg-area { padding: 16px 16px !important; }
+          .dash-input-area { padding: 16px !important; }
+          .dash-quiz-wrap { padding: 16px !important; }
+          .dash-max-w { max-width: 100% !important; }
+          .dash-empty { padding: 24px 16px !important; }
+          .dash-quiz-btn { bottom: 100px !important; right: 16px !important; }
+        }
+        @media (max-width: 1024px) {
+          .dash-header { padding: 16px 24px !important; }
+          .dash-content-pad { padding: 24px !important; }
+          .dash-msg-area { padding: 24px 24px !important; }
+          .dash-input-area { padding: 20px 24px !important; }
+          .dash-quiz-wrap { padding: 24px !important; }
+        }
+      `}</style>
+
+      {/* Mobile hamburger */}
+      <button
+        onClick={() => setSidebarOpen(true)}
+        style={{
+          display: 'none',
+          position: 'fixed',
+          top: 16,
+          left: 16,
+          zIndex: 30,
+          width: 40,
+          height: 40,
+          borderRadius: 10,
+          border: '1px solid #e5e7eb',
+          backgroundColor: '#ffffff',
+          cursor: 'pointer',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+        }}
+        className="mobile-hamburger"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#101828" strokeWidth="2">
+          <path d="M3 12h18M3 6h18M3 18h18" />
+        </svg>
+      </button>
+      <style>{`
+        @media (max-width: 768px) {
+          .mobile-hamburger { display: flex !important; }
+        }
       `}</style>
 
       <Sidebar
@@ -489,19 +539,21 @@ export default function DashboardPage() {
         user={user}
         unclaimedRewards={unclaimedRewards}
         isClaimingRewards={isClaimingRewards}
-        onSelectConversation={selectConversation}
-        onNewChat={newChat}
+        onSelectConversation={(conv) => { selectConversation(conv); setSidebarOpen(false); }}
+        onNewChat={() => { newChat(); setSidebarOpen(false); }}
         onClaimRewards={claimAllRewards}
+        isMobileOpen={sidebarOpen}
+        onToggleMobile={() => setSidebarOpen(false)}
       />
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         {currentConversation && (
-          <div style={{
+          <div className="dash-header" style={{
             padding: '20px 72px',
             borderBottom: '1px solid #e5e7eb',
             backgroundColor: '#ffffff',
           }}>
-            <div style={{
+            <div className="dash-max-w" style={{
               maxWidth: 876,
               margin: '0 auto',
               fontFamily: 'var(--font-inter)',
@@ -561,7 +613,7 @@ export default function DashboardPage() {
 
             {currentConversation && !currentConversation.quizPassed &&
               (currentConversation.totalMessages || 0) >= 10 && (
-              <div style={{
+              <div className="dash-quiz-btn" style={{
                 position: 'fixed',
                 bottom: 120,
                 right: 40,

@@ -39,7 +39,7 @@ export default function QuizUI({
   if (!isComplete) {
     const currentQuestion = currentQuiz[currentQuestionIndex];
     return (
-      <div style={{ maxWidth: 876, margin: '0 auto', padding: '32px 72px' }}>
+      <div className="dash-quiz-wrap dash-max-w" style={{ maxWidth: 876, margin: '0 auto', padding: '32px 72px' }}>
         {/* Quiz Progress Header */}
         <div style={{
           background: 'linear-gradient(135deg, #8C4F00, #6B3B00)',
@@ -190,7 +190,7 @@ export default function QuizUI({
   }
 
   return (
-    <div style={{ maxWidth: 876, margin: '0 auto', padding: '32px 72px' }}>
+    <div className="dash-quiz-wrap dash-max-w" style={{ maxWidth: 876, margin: '0 auto', padding: '32px 72px' }}>
       {/* Quiz Complete */}
       <div style={{
         background: allCorrect

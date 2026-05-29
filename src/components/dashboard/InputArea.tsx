@@ -11,12 +11,12 @@ interface InputAreaProps {
 
 export default function InputArea({ inputValue, isLoading, onInputChange, onSend }: InputAreaProps) {
   return (
-    <div style={{
+    <div className="dash-input-area" style={{
       padding: '24px 72px',
       borderTop: '1px solid #e5e7eb',
       backgroundColor: '#ffffff',
     }}>
-      <div style={{
+      <div className="dash-max-w" style={{
         maxWidth: 876,
         margin: '0 auto',
         display: 'flex',

@@ -135,6 +135,45 @@ export default function Home() {
 
   return (
     <div style={{ backgroundColor: t.bg, minHeight: '100vh', overflow: 'hidden' }}>
+      <style>{`
+        @media (max-width: 768px) {
+          .lp-header-inner { padding: 0 16px !important; }
+          .lp-header-nav { display: none !important; }
+          .lp-header-actions { gap: 8px !important; }
+          .lp-hero { padding: 120px 16px 48px !important; }
+          .lp-hero-title { font-size: 36px !important; line-height: 44px !important; }
+          .lp-hero-subtitle { font-size: 16px !important; }
+          .lp-hero-actions { flex-direction: column !important; }
+          .lp-hero-actions button { width: 100% !important; }
+          .lp-chat-card { max-width: 100% !important; width: 100% !important; }
+          .lp-floating-reward { position: static !important; margin-top: 16px !important; }
+          .lp-floating-streak { position: static !important; margin-top: 16px !important; }
+          .lp-features { padding: 64px 16px !important; }
+          .lp-features-heading { font-size: 28px !important; line-height: 36px !important; }
+          .lp-features-grid { grid-template-columns: 1fr !important; }
+          .lp-how-it-works { padding: 64px 16px !important; }
+          .lp-how-it-works-heading { font-size: 28px !important; line-height: 36px !important; }
+          .lp-steps { flex-direction: column !important; gap: 32px !important; align-items: center !important; }
+          .lp-steps-line { display: none !important; }
+          .lp-categories { padding: 64px 16px !important; }
+          .lp-categories-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+          .lp-topics-grid { grid-template-columns: 1fr !important; }
+          .lp-categories-heading { font-size: 28px !important; line-height: 36px !important; }
+          .lp-cta { padding: 64px 16px !important; }
+          .lp-cta-inner { padding: 32px 24px !important; }
+          .lp-cta-title { font-size: 36px !important; line-height: 44px !important; }
+          .lp-footer { padding: 32px 16px !important; }
+          .lp-footer-inner { flex-direction: column !important; align-items: flex-start !important; gap: 24px !important; }
+          .lp-footer-links { flex-wrap: wrap !important; gap: 16px !important; }
+          .lp-stats-progress { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (min-width: 769px) and (max-width: 1024px) {
+          .lp-hero { padding: 140px 24px 64px !important; }
+          .lp-chat-card { max-width: 100% !important; }
+          .lp-features-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .lp-categories-grid { gap: 48px !important; }
+        }
+      `}</style>
       {/* Header */}
       <motion.header
         initial={{ y: -100 }}
@@ -152,7 +191,7 @@ export default function Home() {
           boxShadow: '0px 1px 2px 0px rgba(0,0,0,0.05)',
         }}
       >
-        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 48px' }}>
+        <div className="lp-header-inner" style={{ maxWidth: 1280, margin: '0 auto', padding: '0 48px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 80 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ fontFamily: 'var(--font-inter)', fontWeight: 700, fontSize: 24, color: t.accent }}>
@@ -160,7 +199,7 @@ export default function Home() {
               </span>
             </div>
 
-            <nav style={{ display: 'flex', gap: 32, alignItems: 'center' }}>
+            <nav className="lp-header-nav" style={{ display: 'flex', gap: 32, alignItems: 'center' }}>
               {['Home', 'How It Works', 'Features'].map((link, i) => (
                 <a
                   key={link}
@@ -184,7 +223,7 @@ export default function Home() {
               ))}
             </nav>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <div className="lp-header-actions" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
               <div style={{
                 display: 'flex',
                 gap: 4,
@@ -263,7 +302,7 @@ export default function Home() {
         style={{ paddingTop: 80 }}
       >
         {/* Hero Section */}
-        <section style={{
+        <section className="lp-hero" style={{
           position: 'relative',
           padding: '160px 48px 96px',
           overflow: 'hidden',
@@ -291,7 +330,7 @@ export default function Home() {
             </motion.div>
 
             <motion.div variants={fadeIn} style={{ maxWidth: 896, paddingBottom: 24 }}>
-              <h1 style={{
+              <h1 className="lp-hero-title" style={{
                 fontFamily: 'var(--font-inter)',
                 fontWeight: 700,
                 fontSize: 64,
@@ -306,7 +345,7 @@ export default function Home() {
             </motion.div>
 
             <motion.div variants={fadeIn} style={{ maxWidth: 672, paddingBottom: 48 }}>
-              <p style={{
+              <p className="lp-hero-subtitle" style={{
                 fontFamily: 'var(--font-inter)',
                 fontWeight: 400,
                 fontSize: 18,
@@ -320,7 +359,7 @@ export default function Home() {
               </p>
             </motion.div>
 
-            <motion.div variants={fadeIn} style={{ paddingBottom: 80 }}>
+            <motion.div className="lp-hero-actions" variants={fadeIn} style={{ paddingBottom: 80 }}>
               <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
                 <motion.button
                   onClick={() => router.push('/signup')}
@@ -367,6 +406,7 @@ export default function Home() {
             {/* AI Chat Preview Card */}
             <motion.div
               variants={fadeIn}
+              className="lp-chat-card"
               style={{
                 position: 'relative',
                 width: 900,
@@ -524,7 +564,7 @@ export default function Home() {
               </div>
 
               {/* Floating Reward Card */}
-              <div style={{
+              <div className="lp-floating-reward" style={{
                 position: 'absolute',
                 top: -40,
                 right: -40,
@@ -559,7 +599,7 @@ export default function Home() {
               </div>
 
               {/* Floating Streak Card */}
-              <div style={{
+              <div className="lp-floating-streak" style={{
                 position: 'absolute',
                 bottom: -24,
                 left: -40,
@@ -589,7 +629,7 @@ export default function Home() {
         </section>
 
         {/* Features Bento Grid */}
-        <section id="features" style={{ padding: '120px 48px', maxWidth: 1280, margin: '0 auto' }}>
+        <section id="features" className="lp-features" style={{ padding: '120px 48px', maxWidth: 1280, margin: '0 auto' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 80 }}>
             <motion.div
               initial={{ opacity: 0, y: 40 }}
@@ -598,7 +638,7 @@ export default function Home() {
               transition={{ duration: 0.6 }}
               style={{ textAlign: 'center' }}
             >
-              <h2 style={{
+              <h2 className="lp-features-heading" style={{
                 fontFamily: 'var(--font-inter)',
                 fontWeight: 600,
                 fontSize: 40,
@@ -625,6 +665,7 @@ export default function Home() {
             </motion.div>
 
             <motion.div
+              className="lp-features-grid"
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -748,7 +789,7 @@ export default function Home() {
         </section>
 
         {/* How It Works */}
-        <section id="how-it-works" style={{
+        <section id="how-it-works" className="lp-how-it-works" style={{
           backgroundColor: t.sectionBg,
           padding: '128px 48px',
           overflow: 'hidden',
@@ -760,7 +801,7 @@ export default function Home() {
             style={{ maxWidth: 1280, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 96 }}
           >
             <motion.div variants={fadeIn} style={{ textAlign: 'center' }}>
-              <motion.h2 variants={fadeIn} style={{
+              <motion.h2 className="lp-how-it-works-heading" variants={fadeIn} style={{
                 fontFamily: 'var(--font-inter)',
                 fontWeight: 600,
                 fontSize: 40,
@@ -783,13 +824,13 @@ export default function Home() {
               </motion.p>
             </motion.div>
 
-            <motion.div variants={fadeIn} style={{
+            <motion.div className="lp-steps" variants={fadeIn} style={{
               display: 'flex',
               justifyContent: 'space-between',
               position: 'relative',
             }}>
               {/* Connector line */}
-              <div style={{
+              <div className="lp-steps-line" style={{
                 position: 'absolute',
                 top: 'calc(50% + 1px)',
                 left: 0,
@@ -842,11 +883,12 @@ export default function Home() {
         </section>
 
         {/* Categories & Rewards */}
-        <section style={{ padding: '120px 48px', maxWidth: 1280, margin: '0 auto' }}>
+        <section className="lp-categories" style={{ padding: '120px 48px', maxWidth: 1280, margin: '0 auto' }}>
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
+            className="lp-categories-grid"
             style={{
               display: 'grid',
               gridTemplateColumns: '1fr 1fr',
@@ -856,7 +898,7 @@ export default function Home() {
           >
             {/* Left: Topics */}
             <motion.div variants={fadeIn}>
-              <h2 style={{
+              <h2 className="lp-categories-heading" style={{
                 fontFamily: 'var(--font-inter)',
                 fontWeight: 600,
                 fontSize: 40,
@@ -868,7 +910,7 @@ export default function Home() {
                 What do you want to master<br />first?
               </h2>
 
-              <div style={{
+              <div className="lp-topics-grid" style={{
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
                 gap: 16,
@@ -987,7 +1029,7 @@ export default function Home() {
                 </div>
 
                 {/* Progress bars */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+                <div className="lp-stats-progress" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
                   {[20, 40, 70, 100].map((opacity, i) => (
                     <div key={i} style={{
                       height: 40,
@@ -1003,7 +1045,7 @@ export default function Home() {
         </section>
 
         {/* Final CTA */}
-        <section style={{
+        <section className="lp-cta" style={{
           padding: '128px 48px',
           position: 'relative',
           overflow: 'hidden',
@@ -1015,6 +1057,7 @@ export default function Home() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
+            className="lp-cta-inner"
             style={{
               maxWidth: 1280,
               margin: '0 auto',
@@ -1026,7 +1069,7 @@ export default function Home() {
               boxShadow: isDark ? '0px 0px 100px 0px rgba(247,147,26,0.05)' : '0px 0px 60px 0px rgba(247,147,26,0.05)',
             }}
           >
-            <motion.h2 variants={fadeIn} style={{
+            <motion.h2 className="lp-cta-title" variants={fadeIn} style={{
               fontFamily: 'var(--font-inter)',
               fontWeight: 700,
               fontSize: 64,
@@ -1096,13 +1139,13 @@ export default function Home() {
       </motion.div>
 
       {/* Footer */}
-      <footer style={{
+      <footer className="lp-footer" style={{
         backgroundColor: t.footerBg,
         borderTop: `1px solid ${t.border}`,
         padding: '49px 48px 48px',
       }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+          <div className="lp-footer-inner" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <span style={{ fontFamily: 'var(--font-inter)', fontWeight: 600, fontSize: 24, color: t.accent }}>
                 BitPath
@@ -1111,7 +1154,7 @@ export default function Home() {
                 &copy; 2026 BitPath. Empowering Hack4Freedom.
               </p>
             </div>
-            <div style={{ display: 'flex', gap: 32 }}>
+            <div className="lp-footer-links" style={{ display: 'flex', gap: 32 }}>
               {['Privacy Policy', 'Terms of Service', 'Security', 'API Documentation'].map((link) => (
                 <a
                   key={link}

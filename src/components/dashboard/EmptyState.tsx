@@ -77,7 +77,7 @@ export default function EmptyState({ inputValue, isLoading, onInputChange, onSen
   ];
 
   return (
-    <div style={{
+    <div className="dash-empty" style={{
       flex: 1,
       display: 'flex',
       flexDirection: 'column',
@@ -86,7 +86,7 @@ export default function EmptyState({ inputValue, isLoading, onInputChange, onSen
       backgroundColor: '#ffffff',
       overflow: 'auto',
     }}>
-      <div style={{
+      <div className="dash-max-w" style={{
         maxWidth: 876,
         width: '100%',
         display: 'flex',
@@ -100,7 +100,7 @@ export default function EmptyState({ inputValue, isLoading, onInputChange, onSen
           transition={{ duration: 0.5 }}
           style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
         >
-          <h1 style={{
+          <h1 className="dash-empty-title" style={{
             fontFamily: 'var(--font-inter)',
             fontWeight: 800,
             fontSize: 32,
@@ -313,7 +313,7 @@ export default function EmptyState({ inputValue, isLoading, onInputChange, onSen
             </span>
           </div>
 
-          <div style={{
+          <div className="learning-grid" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
             gap: 16,
@@ -443,6 +443,16 @@ export default function EmptyState({ inputValue, isLoading, onInputChange, onSen
           </div>
         </motion.div>
       </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .dash-empty-title { font-size: 24px !important; }
+          .learning-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (min-width: 769px) and (max-width: 1024px) {
+          .learning-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+      `}</style>
     </div>
   );
 }

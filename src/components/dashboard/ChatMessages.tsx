@@ -72,7 +72,7 @@ export default function ChatMessages({
   messagesEndRef,
 }: ChatMessagesProps) {
   return (
-    <div style={{
+    <div className="dash-msg-area" style={{
       flex: 1,
       overflowY: 'auto',
       padding: '32px 72px',
@@ -85,6 +85,7 @@ export default function ChatMessages({
           {[1, 2, 3].map((i) => (
             <div
               key={i}
+              className="dash-max-w"
               style={{
                 display: 'flex',
                 marginBottom: 28,
@@ -174,7 +175,7 @@ export default function ChatMessages({
           {/* Quiz Readiness Banner - shown when quiz is available */}
           {currentConversation && !currentConversation.quizPassed &&
             (currentConversation.totalMessages || 0) >= 10 && (
-            <div style={{
+            <div className="dash-max-w" style={{
               maxWidth: 876,
               margin: '0 auto 28px',
               padding: 28,
@@ -204,7 +205,7 @@ export default function ChatMessages({
 
           {/* Quiz Passed Banner */}
           {currentConversation?.quizPassed && (
-            <div style={{
+            <div className="dash-max-w" style={{
               maxWidth: 876,
               margin: '0 auto 28px',
               padding: 28,
@@ -235,7 +236,7 @@ export default function ChatMessages({
 
       {/* Typing Indicator */}
       {isTyping && (
-        <div style={{
+        <div className="dash-max-w" style={{
           display: 'flex',
           gap: 6,
           padding: '20px 24px',

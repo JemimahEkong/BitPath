@@ -113,6 +113,14 @@ function LoginContent() {
 
   return (
     <div style={{ backgroundColor: t.bg, minHeight: '100vh', overflow: 'hidden' }}>
+      <style>{`
+        @media (max-width: 480px) {
+          .login-card { width: 100% !important; max-width: 100% !important; border-radius: 24px !important; padding: 24px !important; }
+        }
+        @media (max-width: 768px) {
+          .login-card { max-width: 440px !important; }
+        }
+      `}</style>
       {/* Theme Toggle */}
       <div style={{ position: 'fixed', top: 24, right: 24, zIndex: 50 }}>
         <div style={{
@@ -173,6 +181,7 @@ function LoginContent() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
+          className="login-card"
           style={{
             width: 448,
             borderRadius: 32,
