@@ -394,6 +394,12 @@ Frontend Zustand stores interact with backend endpoints for:
 
 ---
 
+# Links
+
+- Frontend deployment link: https://bitpath.up.railway.app
+- Backend deployment link: https://bitpath-backend.up.railway.app
+- Demo video link: https://drive.google.com/file/d/15G6Lj4qPACM_GcOeynx4BF0b1QnQMNxE/view?usp=sharing 
+
 # Contributing
 
 1. Fork the repository
@@ -404,5 +410,5 @@ Frontend Zustand stores interact with backend endpoints for:
 ---
 
 # License
-
+MIT 
 MIT Licensed
